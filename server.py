@@ -5,7 +5,7 @@ import os
 load_dotenv()
 app = Flask(__name__)
 
-
+listen_port = os.environ.get("SERVER_PORT")
 @app.route('/sheet', methods=["POST"])
 def sheet() -> str:
     request_params = request.args.to_dict()
@@ -13,13 +13,10 @@ def sheet() -> str:
     csv_path: str = request_params["csvPath"]
     midi_path: str = request_params["midiPath"]
     
-    service = SheetGenerateService()
+    service = SheetGenerateService(csv_path, midi_path)
     sheet = service.start()
-
-
     return jsonify(sheet)
 
 if __name__ == '__main__':
-
-    pass
-
+    print(f"[Sheet Generate Engine Server] start listen on {listen_port}")
+    app.run(host='0.0.0.0', port=listen_port)
