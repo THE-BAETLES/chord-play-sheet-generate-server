@@ -3,17 +3,16 @@ class SheetGenerateService:
         
         self.csv_path = csv_path
         self.midi_path = midi_path
-
         pass
 
     def get_bpm(self):
         pass
 
     def make_sheet(self, bpm):
-        pass
+        return bpm
 
     def start(self):
         bpm = self.get_bpm()
         sheet = self.make_sheet(bpm)
-        
+
         return sheet
