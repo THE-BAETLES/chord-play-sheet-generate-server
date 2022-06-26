@@ -6,10 +6,11 @@ load_dotenv()
 app = Flask(__name__)
 
 listen_port = os.environ.get("SERVER_PORT")
-@app.route('/sheet', methods=["POST"])
+@app.route('/sheet', methods=["GET"])
 def sheet() -> str:
     request_params = request.args.to_dict()
     
+    print(request_params)
     csv_path: str = request_params["csvPath"]
     midi_path: str = request_params["midiPath"]
     

@@ -19,9 +19,9 @@ class SheetGenerateService:
             for i in range(len(mf.tracks)):
                 mf.tracks[i].events = [ev for ev in mf.tracks[i].events if ev.channel != 10]          
 
-        return converter.parse('accompaniment.mid'), mf
+        return converter.parse(midi_path), mf
 
-    def offset_to_sec(offset, bpm):
+    def offset_to_sec(self, offset, bpm):
         return offset * (60 / bpm)
 
 
@@ -44,7 +44,7 @@ class SheetGenerateService:
         return bpm
 
 
-    def get_position(start_time, one_durtaion):
+    def get_position(self,start_time, one_durtaion):
         """
             params:
             one_duration: 4 * (60 / bpm)
@@ -71,7 +71,7 @@ class SheetGenerateService:
         return sheet
 
     def start(self):
-        bpm = self.get_bpm()
+        bpm = self.get_bpm(self.midi_path)
         sheet = self.make_sheet(bpm)
 
         return sheet
