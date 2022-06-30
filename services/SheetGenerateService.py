@@ -39,7 +39,11 @@ class SheetGenerateService:
         base_midi, midi = self.open_midi(midi_path, False)
         chordify_midi = base_midi.chordify()
 
+        print(chordify_midi)
+
         bpm = chordify_midi[1].number
+
+        print("bpm = ", chordify_midi[1])
 
         return bpm
 
@@ -58,6 +62,8 @@ class SheetGenerateService:
   
         dict_csv_iter = csv.itertuples()
 
+        print("one_duration = ", self.get_one_duration(bpm))
+
         sheet = {
             'bpm': bpm,
             'info': [{
@@ -68,6 +74,7 @@ class SheetGenerateService:
                 } for info in dict_csv_iter]
         }
 
+        # print("sheet: ", sheet)
         return sheet
 
     def start(self):
