@@ -14,8 +14,9 @@ def sheet() -> str:
     csv_path: str = request_params["csvPath"]
     midi_path: str = request_params["midiPath"]
     
-    service = SheetGenerateService(csv_path, midi_path)
-    sheet = service.start()
+    with SheetGenerateService(csv_path, midi_path) as sheetService:
+        sheet = sheetService.start()
+        
     return jsonify(sheet)
 
 if __name__ == '__main__':

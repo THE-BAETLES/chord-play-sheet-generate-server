@@ -1,12 +1,24 @@
 import math
 import pandas as pd
+import os
 from music21 import converter, corpus, instrument, midi, note, chord, pitch, environment
 class SheetGenerateService:
    
     def __init__(self, csv_path: str, midi_path: str) -> None:
         self.csv_path = csv_path
         self.midi_path = midi_path
-    
+        
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *args):
+        
+        if os.path.exists(self.csv_path):
+            os.remove(self.csv_path)
+        
+        if os.path.exists(self.midi_path):
+            os.remove(self.midi_path)
+
     def open_midi(self, midi_path, remove_drums):
     # There is an one-line method to read MIDIs
     # but to remove the drums we need to manipulate some
