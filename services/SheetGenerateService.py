@@ -2,6 +2,8 @@ import math
 import pandas as pd
 import os
 from music21 import converter, corpus, instrument, midi, note, chord, pitch, environment
+
+
 class SheetGenerateService:
    
     def __init__(self, csv_path: str, midi_path: str) -> None:
@@ -62,12 +64,12 @@ class SheetGenerateService:
 
     def get_position(self,start_time, one_durtaion):
         """
+            TODO: update this algorithm if duration time is up > 0.5 append list the chord
             params:
             one_duration: 4 * (60 / bpm)
         """
 
         return math.ceil(((start_time / one_durtaion -0.001) * 100) / 25)
-
 
     def make_sheet(self, bpm):
         csv = pd.read_csv(self.csv_path)
