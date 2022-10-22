@@ -14,7 +14,7 @@ class SheetGenerateService:
         return self
 
     def __exit__(self, *args):
-        
+        # Delete Docker Volume Resources
         if os.path.exists(self.csv_path):
             os.remove(self.csv_path)
         
@@ -38,7 +38,6 @@ class SheetGenerateService:
     def offset_to_sec(self, offset, bpm):
         return offset * (60 / bpm)
 
-
     def get_one_duration(self, bpm):
         """
             4분의 4박자가 전부 진행되는데 소요되는 시간을 구함
@@ -47,7 +46,6 @@ class SheetGenerateService:
             
         """
         return 4 * (60 / bpm)
-
 
     def get_bpm(self, midi_path):
         base_midi, midi = self.open_midi(midi_path, False)
