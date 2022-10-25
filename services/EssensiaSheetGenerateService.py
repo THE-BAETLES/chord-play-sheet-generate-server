@@ -98,7 +98,8 @@ class EssentiaSheetGenerateService(BaseSheetGenerateService):
         dict_csv_iter = csv.itertuples()
         
         dict_csv_iter = [
-            {'chord': info.chord,
+            {
+            'chord': info.chord,
              'start' : info.start,
              'end': info.end
             } for info in dict_csv_iter
@@ -123,10 +124,13 @@ class EssentiaSheetGenerateService(BaseSheetGenerateService):
         new_beat, align_pos_info = pull_position_info(self.beats, pos_info)
         
         response_service = ResponseDataGenerateService(self.bpm, new_beat, align_pos_info, chord_info)
-        response_sheet = response_service.get_res_sheet_data()
+        response_infos = response_service.get_res_infos()
         
-        return response_sheet
-    
+        response_sheet = {
+            "bpm": self.bpm,
+            "infos": response_infos
+        }
+        return response_sheet    
     
     def start(self):
         return self.make_sheet()
