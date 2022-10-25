@@ -7,7 +7,6 @@ from music21 import converter, corpus, instrument, midi, note, chord, pitch, env
 class BaseSheetGenerateService:
     def __init__(self) -> None:
         pass
-    
     def __enter__(self):
         return self
     

@@ -4,3 +4,10 @@
 # Cache
 __pycache__/*
 */__pycache__
+
+# test
+test_data/*
+*_test.py
+
+# rest
+*.rest

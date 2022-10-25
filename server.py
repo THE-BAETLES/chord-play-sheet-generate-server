@@ -1,39 +1,21 @@
 from dotenv import load_dotenv
 from services.EssensiaSheetGenerateService import EssentiaSheetGenerateService
 from fastapi import FastAPI, Query
+from utils.request import string_to_float_list
 from typing import List
+from models.SheetRequest import SheetRequestModel
+
 load_dotenv()
 app = FastAPI()
 
-
-def test_deco(flask_func):
-    print("Hello")
-    def inner(*args, **kwargs):
-        print("Hello Deco")
-        print(args, kwargs)
-        return flask_func(*args, **kwargs)
-    return inner
-        
-@app.get('/sheet')
-async def sheet(csv_path: str, midi_path: str, bpm: float, beats: List[float]) -> str:
-    
-    with EssentiaSheetGenerateService(bpm, beats, csv_path, midi_path) as sheetService:
+@app.post('/sheet')
+async def sheet(sheetRequest: SheetRequestModel):
+    with EssentiaSheetGenerateService(sheetRequest.csv_path, sheetRequest.midi_path,sheetRequest.bpm, sheetRequest.beats) as sheetService:
         sheet = sheetService.start()
     return sheet
 
-
-@test_deco
-@app.get('/test')
-async def test(arr: str):
-    arr_list = list(map(lambda x: float(x), arr[1:-1].split(',')))
-    print(arr_list)
-    print(type(arr_list))
-    return arr
-
 @app.get('/healthCheck')
 async def healthCheck(test:str):
-    
-    
     return "I`m Healthy now"
 
 if __name__ == '__main__':

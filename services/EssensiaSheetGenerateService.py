@@ -1,14 +1,14 @@
 
 from services.BaseSheetGenerateService import BaseSheetGenerateService
 from services.ResponseDataGenerateService import ResponseDataGenerateService
-from utils.essentia import get_align_position_info,get_bpm_beat_info, pull_position_info
+from utils.essentia import get_align_position_info, pull_position_info
 from utils.essentia import get_bpm_beat_info
 from typing import List
 import pandas as pd
 
 class EssentiaSheetGenerateService(BaseSheetGenerateService):
     def __init__(self, csv_path, midi_path, bpm, beats) -> None:
-        super(self)
+        super()
         self.csv_path = csv_path
         self.midi_path = midi_path
         self.bpm = bpm
@@ -128,6 +128,7 @@ class EssentiaSheetGenerateService(BaseSheetGenerateService):
             "bpm": self.bpm,
             "infos": response_infos
         }
+        
         return response_sheet    
     
     def start(self):
