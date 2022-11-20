@@ -1,4 +1,3 @@
-
 from services.BaseSheetGenerateService import BaseSheetGenerateService
 from services.ResponseDataGenerateService import ResponseDataGenerateService
 from utils.essentia import get_align_position_info, pull_position_info
@@ -32,12 +31,21 @@ class EssentiaSheetGenerateService(BaseSheetGenerateService):
                     e_index = m_index
                 else:
                     s_index = m_index + 1
-                    
+            
             return s_index
         
         pos = find_pos_bs(value)
+        beat_onset = beat_info_list[pos]
+
+        if pos != 0:
+          left_beat_onset = beat_info_list[pos - 1]
+          
+          if abs(value - left_beat_onset) < abs(beat_onset - value):
+            pos -= 1
         
         return pos
+
+        
     def compress_sheet_info(self, sheet_info):
         """
             sheet_info: pandas_object
@@ -89,6 +97,16 @@ class EssentiaSheetGenerateService(BaseSheetGenerateService):
             inference 결과가 0.5 미만일 경우 제외함
         """
         return list(filter(lambda x: (x['end'] - x['start']) >= 0.8 , sheet_info))
+
+    
+
+    def split_chord(self,chord):
+        """_summary_
+        Args:
+            chord: A:min
+        """
+        root, triad = chord.split(':')
+        return root, triad, 'none'
     
     
     def make_sheet(self):
@@ -118,19 +136,152 @@ class EssentiaSheetGenerateService(BaseSheetGenerateService):
                 } for info in dict_csv_iter]
         }
         
-        pos_info, chord_info = get_align_position_info(self.beats, sheet)
-        new_beat, align_pos_info = pull_position_info(self.beats, pos_info)
-        
-        response_service = ResponseDataGenerateService(self.bpm, new_beat, align_pos_info, chord_info)
-        response_infos = response_service.get_res_infos()
-        
-        response_sheet = {
-            "bpm": self.bpm,
-            "infos": response_infos
+
+        responseInfo = []
+
+        # epos를 idx+1의 spos로 고정
+        for idx, info in enumerate(sheet['info']):
+          if idx < len(sheet['info']) - 1:
+            info['epos'] = sheet['info'][idx + 1]['spos']
+
+
+        # 앞에 비트 넣기 (align)
+        appearCount = [0, 0, 0, 0]
+
+        for idx, info in enumerate(sheet['info']):
+          appearCount[info['spos'] % 4] += 1
+
+        prefixCount = (4 - appearCount.index(max(appearCount)))
+
+        alignedSheet = {
+            'bpm': sheet['bpm'],
+            'info': [],
         }
         
-        return response_sheet    
+        newBeats = []
+        
+        for i in range(0, prefixCount):
+          alignedSheet['info'].append({
+              'chord': "none:none",
+              'spos' : i,
+              'epos' : i + 1,
+          })
+
+          newBeats.append(0)
+
+        for i in range(prefixCount, prefixCount + sheet['info'][0]['spos'] % 4):
+          alignedSheet['info'].append({
+              'chord': "none:none",
+              'spos' : i,
+              'epos' : i + 1,
+          })
+
+        
+        for idx, info in enumerate(sheet['info']):
+          alignedSheet['info'].append({
+              'chord': info['chord'],
+              'spos': info['spos'] + prefixCount,
+              'epos': info['epos'] + prefixCount
+          })
+        
+        for i in range(0, len(beats)):
+          newBeats.append(beats[i])
+
+        sheet = alignedSheet
+
+        # 보정
+        for idx, info in enumerate(sheet['info']):
+          if idx < prefixCount:
+            continue;
+
+          if info['spos'] % 4 == 1 and sheet['info'][idx - 1]['spos'] < info['spos'] - 1:
+            # 두번째 칸 보정
+            newInfo = {
+                'chord': info['chord'],
+                'spos': info['spos'] - 1,
+                'epos': info['epos'],
+            }
+            
+            sheet['info'][idx] = newInfo
+            
+            if idx > 0:
+              preInfo = sheet['info'][idx - 1]
+
+              newPreInfo = {
+                'chord': preInfo['chord'],
+                'spos': preInfo['spos'],
+                'epos': preInfo['epos'] - 1,
+              }
+              
+              sheet['info'][idx - 1] = newPreInfo
+
+          
+          elif info['spos'] % 4 == 3 and info['epos'] - info['spos'] >= 2:
+            # 네번째 칸 보정
+            newInfo = {
+                'chord': info['chord'],
+                'spos': info['spos'] + 1,
+                'epos': info['epos'],
+            }
+            
+            sheet['info'][idx] = newInfo
+            
+            if idx > 0:
+              preInfo = sheet['info'][idx - 1]
+
+              newPreInfo = {
+                'chord': preInfo['chord'],
+                'spos': preInfo['spos'],
+                'epos': preInfo['epos'] + 1,
+              }
+              
+              sheet['info'][idx - 1] = newPreInfo
+            
+            print(info)
+
+        print(sheet)
+
+        # 서식 맞춤
+        newSheet = []
+
+        for i in range(0, sheet['info'][0]['spos']):
+          newSheet.append({
+                'chord': {
+                    'root': 'none',
+                    'triad': 'none',
+                    'bass': 'none' 
+                },
+                'beat_time': newBeats[i]
+            })
+        
+        for idx, info in enumerate(sheet['info']):
+          root, triad, bass = self.split_chord(info['chord'])
+          
+          newSheet.append({
+              'chord': {
+                  'root': root,
+                  'triad' : triad,
+                  'bass' : bass
+              },
+              'beat_time': newBeats[info['spos'] + 1]
+          })
+
+          for i in range(info['spos'] + 2, info['epos'] + 1):
+            newSheet.append({
+                'chord': {
+                    'root': 'none',
+                    'triad': 'none',
+                    'bass': 'none' 
+                },
+                'beat_time': newBeats[i]
+            })
+            
+        result = {
+          'bpm': sheet['bpm'],
+          'infos': newSheet
+        }
+
+        return result
     
     def start(self):
         return self.make_sheet()
-                
