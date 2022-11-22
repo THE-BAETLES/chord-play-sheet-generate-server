@@ -2,7 +2,6 @@
 from services.BaseSheetGenerateService import BaseSheetGenerateService
 from services.ResponseDataGenerateService import ResponseDataGenerateService
 from utils.essentia import get_align_position_info, pull_position_info
-from utils.essentia import get_bpm_beat_info
 from typing import List
 import pandas as pd
 

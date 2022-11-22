@@ -50,12 +50,8 @@ class SheetGenerateService:
     def get_bpm(self, midi_path):
         base_midi, midi = self.open_midi(midi_path, False)
         chordify_midi = base_midi.chordify()
-
-        print(chordify_midi)
-
         bpm = chordify_midi[1].number
 
-        print("bpm = ", chordify_midi[1])
 
         return bpm
 
@@ -73,8 +69,6 @@ class SheetGenerateService:
         csv = pd.read_csv(self.csv_path)
   
         dict_csv_iter = csv.itertuples()
-
-        print("one_duration = ", self.get_one_duration(bpm))
 
         sheet = {
             'bpm': bpm,

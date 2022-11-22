@@ -10,10 +10,14 @@ class BaseSheetGenerateService:
     def __enter__(self):
         return self
     
-    def __exit__(self):
+    def __exit__(self, *args):
         # Delete Resources
         # TODO: Update to Kubernetes Resource Delete
-        pass
+        if os.path.exists(self.csv_path):
+            os.remove(self.csv_path)
+        
+        if os.path.exists(self.midi_path):
+            os.remove(self.midi_path)
     
     def open_midi(self, midi_path, remove_drums):
     # There is an one-line method to read MIDIs

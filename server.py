@@ -3,7 +3,7 @@ from services.EssensiaSheetGenerateService import EssentiaSheetGenerateService
 from fastapi import FastAPI, Query
 from utils.request import string_to_float_list
 from typing import List
-from models.SheetRequest import SheetRequestModel
+from model.SheetRequest import SheetRequestModel
 
 load_dotenv()
 app = FastAPI()

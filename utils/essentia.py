@@ -20,9 +20,6 @@ def pull_position_info(beat_infos, align_pos_info):
         if chk_cnt == 3:
             start_pos_index = i
             break
-    
-    print("start position = ",start_pos_index)
-    
     start_pos = align_pos_info[start_pos_index]
     
     if start_pos % 4 == 0:
@@ -38,7 +35,6 @@ def pull_position_info(beat_infos, align_pos_info):
     
     
     for i in range(1, 5):
-        print(fix_beat * i)
         new_beat.appendleft(fix_beat * (5-i))
         
     for i in range(len(align_pos_info)):
