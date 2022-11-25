@@ -183,15 +183,15 @@ class EssentiaSheetGenerateService(BaseSheetGenerateService):
               'epos': info['epos'] + prefixCount
           })
         
-        for i in range(0, len(beats)):
-          newBeats.append(beats[i])
+        for i in range(0, len(self.beats)):
+          newBeats.append(self.beats[i])
 
         sheet = alignedSheet
 
         # 보정
         for idx, info in enumerate(sheet['info']):
           if idx < prefixCount:
-            continue;
+            continue
 
           if info['spos'] % 4 == 1 and sheet['info'][idx - 1]['spos'] < info['spos'] - 1:
             # 두번째 칸 보정
